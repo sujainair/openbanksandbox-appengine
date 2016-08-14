@@ -23,7 +23,7 @@ public class JSON2List {
     private static final String AC_SUHAS = "suhas_IND";
     private static final String AC_SUJAI = "ing_1";
 
-    public String getTransactions (String user) {
+    public String getTransactions (String user,String token, String tokenSecret) {
         //System.out.println("getTransactions" + user);
         OauthMethods oauthMethods = new OauthMethods();
         String transactionString = null;
@@ -40,16 +40,16 @@ public class JSON2List {
         }
         String getLink = API_LINK + "/banks/" + BANK + "/accounts/" + ACName + "/owner/transactions";
         try {
-            transactionString =  oauthMethods.get(getLink,user);
+            transactionString =  oauthMethods.get(getLink,token,tokenSecret);
         } catch (OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException | IOException e) {
             e.printStackTrace();
         }
         return transactionString;
     }
 
-    public List<Transaction> createList(String user){
+    public List<Transaction> createList(String user, String token,String tokenSecret){
         //System.out.println("CreateList : " + user);
-        String JSONString = getTransactions(user);
+        String JSONString = getTransactions(user,token,tokenSecret);
         JSONObject obj = new JSONObject(JSONString);
         JSONArray transactionArr = obj.getJSONArray("transactions");
         List<Transaction> list = new ArrayList<>();
@@ -76,7 +76,7 @@ public class JSON2List {
         return list;
     }
 
-    public String sendJson(String user, String toName, String amount){
+    public String sendJson(String user, String toName, String amount,String token, String tokenSecret){
         String to_ac;
         switch (toName){
             case OauthMethods.NAME_SUHAS:
@@ -109,7 +109,7 @@ public class JSON2List {
         String getLink = API_LINK + "/banks/" + BANK + "/accounts/" + ACName + "/owner/transactions";
         String transactionid=null;
         try {
-            response =  oauthMethods.post(getLink,JSONString,user);
+            response =  oauthMethods.post(getLink,JSONString,token,tokenSecret);
             JSONObject respObj = new JSONObject(response);
             transactionid = respObj.getString("transaction_id");
         } catch (OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException | IOException e) {

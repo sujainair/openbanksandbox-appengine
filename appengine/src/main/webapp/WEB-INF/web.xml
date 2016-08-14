@@ -11,6 +11,10 @@
     <servlet-class>com.appengine.openbank.Login</servlet-class>
   </servlet>
   <servlet>
+    <servlet-name>OauthInitiate</servlet-name>
+    <servlet-class>com.appengine.openbank.InitiateOauthServlet</servlet-class>
+  </servlet>
+  <servlet>
     <servlet-name>transaction</servlet-name>
     <servlet-class>com.appengine.openbank.TransactionServlet</servlet-class>
   </servlet>
@@ -21,5 +25,9 @@
   <servlet-mapping>
     <servlet-name>transaction</servlet-name>
     <url-pattern>/home</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>OauthInitiate</servlet-name>
+    <url-pattern>/initiate</url-pattern>
   </servlet-mapping>
 </web-app>

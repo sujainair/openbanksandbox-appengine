@@ -20,33 +20,29 @@ import oauth.signpost.exception.OAuthCommunicationException;
 import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Arrays;
 
 // [START example]
 @SuppressWarnings("serial")
 public class InitiateOauthServlet extends HttpServlet {
 
   @Override
-  public void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-    PrintWriter out = resp.getWriter();
-    out.println("Hello, world by list");
+  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
     OauthMethods oauthMethods = new OauthMethods();
-    String[] response = null;
     try {
-      response = oauthMethods.initiate("http://driven-rider-133516.appspot.com/initiate", oauthMethods.USER_SUJAI);
-    } catch (OAuthMessageSignerException e) {
-      e.printStackTrace();
-    } catch (OAuthExpectationFailedException e) {
-      e.printStackTrace();
-    } catch (OAuthCommunicationException e) {
+      String[] token = oauthMethods.initiate("https://apisandbox.openbankproject.com/oauth/token",req.getParameter("oauth_verifier"),req.getSession().getAttribute("token").toString(), req.getSession().getAttribute("token_secret").toString());
+      req.getSession().setAttribute("token",token[0]);
+      req.getSession().setAttribute("token_secret",token[1]);
+    } catch (OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException e) {
       e.printStackTrace();
     }
-    out.println(response);
-    resp.sendRedirect("https://apisandbox.openbankproject.com/oauth/authorize?oauth_token=" + response[0]);
+    resp.sendRedirect("/home");
   }
 }
 // [END example]

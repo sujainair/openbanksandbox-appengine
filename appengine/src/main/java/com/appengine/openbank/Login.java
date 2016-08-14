@@ -16,6 +16,10 @@
 
 package com.appengine.openbank;
 
+import oauth.signpost.exception.OAuthCommunicationException;
+import oauth.signpost.exception.OAuthExpectationFailedException;
+import oauth.signpost.exception.OAuthMessageSignerException;
+
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -54,7 +58,15 @@ public class Login extends HttpServlet {
                     if(upassword.equals(PWD_SUHAS)){
                         req.getSession().setAttribute("user", OauthMethods.USER_SUHAS);
                         req.getSession().setAttribute("username","Suhas");
-                        resp.sendRedirect("/home");
+                        try {
+                            //String token = oauthMethods.initiate("http://driven-rider-133516.appspot.com/initiate");
+                            String[] token = oauthMethods.initiate("http://localhost:8080/initiate");
+                            req.getSession().setAttribute("token_secret",token[1]);
+                            req.getSession().setAttribute("token",token[0]);
+                            resp.sendRedirect("https://apisandbox.openbankproject.com/oauth/authorize?oauth_token=" + token[0]);
+                        } catch (OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException e) {
+                            e.printStackTrace();
+                        }
                     }
                     else {
                         resp.sendRedirect("/pages/login.jsp?action=failed");
@@ -64,7 +76,14 @@ public class Login extends HttpServlet {
                     if(upassword.equals(PWD_SUJAI)){
                         req.getSession().setAttribute("user", OauthMethods.USER_SUJAI);
                         req.getSession().setAttribute("username","Sujai");
-                        resp.sendRedirect("/home");
+                        try {
+                            String[] token = oauthMethods.initiate("http://localhost:8080/initiate");
+                            req.getSession().setAttribute("token_secret",token[1]);
+                            req.getSession().setAttribute("token",token[0]);
+                            resp.sendRedirect("https://apisandbox.openbankproject.com/oauth/authorize?oauth_token=" + token[0]);
+                        } catch (OAuthMessageSignerException | OAuthExpectationFailedException | OAuthCommunicationException e) {
+                            e.printStackTrace();
+                        }
                     }
                     else {
                         resp.sendRedirect("/pages/login.jsp?action=failed");

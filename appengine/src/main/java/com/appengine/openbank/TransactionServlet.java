@@ -35,7 +35,7 @@ public class TransactionServlet extends HttpServlet {
       return;
     }
     JSON2List json2List = new JSON2List();
-    List<Transaction> transactions = json2List.createList(user);
+    List<Transaction> transactions = json2List.createList(user,req.getSession().getAttribute("token").toString(),req.getSession().getAttribute("token_secret").toString());
     req.setAttribute("transactions",transactions);
     RequestDispatcher dispatcher = req.getRequestDispatcher("/pages/home.jsp");
     dispatcher.forward(req, resp);
@@ -51,7 +51,7 @@ public class TransactionServlet extends HttpServlet {
     String action = (String) req.getParameter("action");
     if (action.equals("transfer")){
       JSON2List json2List  = new JSON2List();
-      String transactionId = json2List.sendJson(user,req.getParameter("toname"),req.getParameter("amount"));
+      String transactionId = json2List.sendJson(user,req.getParameter("toname"),req.getParameter("amount"),req.getSession().getAttribute("token").toString(),req.getSession().getAttribute("token_secret").toString());
       resp.sendRedirect("/pages/transfer.jsp?action=" + transactionId);
     }
     else

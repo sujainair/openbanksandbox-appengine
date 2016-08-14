@@ -22,9 +22,9 @@ public class OauthMethods {
     public static final String USER_SUJAI = "1";
     public static final String NAME_SUJAI = "Sujai";
 
-    public String post(String endpointUrl, String JSONPayload, String user)throws IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
+    public String post(String endpointUrl, String JSONPayload, String token, String tokenSecret)throws IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
 
-        String CONS_KEY, CONS_SECRET, TOKEN, TOKEN_SECRET;
+        String CONS_KEY, CONS_SECRET;
         Properties prop = new Properties();
         try{
             prop.load(new FileInputStream("resources/dev.properties"));
@@ -36,8 +36,6 @@ public class OauthMethods {
         //Google DB not free so using prop file
         CONS_KEY = prop.getProperty("CONS_KEY");
         CONS_SECRET = prop.getProperty("CONS_SECRET");
-        TOKEN = prop.getProperty("TOKEN");
-        TOKEN_SECRET = prop.getProperty("TOKEN_SECRET");
 
         //Create an HttpURLConnection and add some headers
         URL url = new URL(endpointUrl);
@@ -49,7 +47,7 @@ public class OauthMethods {
 
         //Sign the request
         OAuthConsumer dealabsConsumer = new DefaultOAuthConsumer(CONS_KEY,CONS_SECRET);
-        dealabsConsumer.setTokenWithSecret(TOKEN,TOKEN_SECRET);
+        dealabsConsumer.setTokenWithSecret(token,tokenSecret);
         dealabsConsumer.sign(urlConnection);
 
         //Send the payload to the connection
@@ -66,10 +64,10 @@ public class OauthMethods {
 
         //Send the request and read the output
         try {
-                //System.out.println("Response: " + urlConnection.getResponseCode() + " " + urlConnection.getResponseMessage());
+                System.out.println("Response: " + urlConnection.getResponseCode() + " " + urlConnection.getResponseMessage());
                 InputStream in = new BufferedInputStream(urlConnection.getInputStream());
                 String inputStreamString = new Scanner(in,"UTF-8").useDelimiter("\\A").next();
-                //System.out.println(inputStreamString);
+                System.out.println(inputStreamString);
                 return inputStreamString;
         }
         finally {
@@ -77,8 +75,8 @@ public class OauthMethods {
         }
     }
 
-    public String get(String endpointUrl, String user)throws IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
-        String CONS_KEY, CONS_SECRET, TOKEN, TOKEN_SECRET;
+    public String get(String endpointUrl, String token, String tokenSecret)throws IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
+        String CONS_KEY, CONS_SECRET;
         Properties prop = new Properties();
         try{
             prop.load(new FileInputStream("resources/dev.properties"));
@@ -90,8 +88,6 @@ public class OauthMethods {
         //Google DB not free so using prop file
         CONS_KEY = prop.getProperty("CONS_KEY");
         CONS_SECRET = prop.getProperty("CONS_SECRET");
-        TOKEN = prop.getProperty("TOKEN");
-        TOKEN_SECRET = prop.getProperty("TOKEN_SECRET");
 
         //Create an HttpURLConnection and add some headers
         URL url = new URL(endpointUrl);
@@ -102,15 +98,15 @@ public class OauthMethods {
 
         //Sign the request
         OAuthConsumer dealabsConsumer = new DefaultOAuthConsumer(CONS_KEY,CONS_SECRET);
-        dealabsConsumer.setTokenWithSecret(TOKEN,TOKEN_SECRET);
+        dealabsConsumer.setTokenWithSecret(token,tokenSecret);
         dealabsConsumer.sign(urlConnection);
 
         //Send the request and read the output
         try {
-            //System.out.println("Response: " + urlConnection.getResponseCode() + " " + urlConnection.getResponseMessage());
+            System.out.println("Response: " + urlConnection.getResponseCode() + " " + urlConnection.getResponseMessage());
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
             String inputStreamString = new Scanner(in,"UTF-8").useDelimiter("\\A").next();
-            //System.out.println(inputStreamString);
+            System.out.println(inputStreamString);
             return inputStreamString;
         }
         finally {
@@ -118,7 +114,7 @@ public class OauthMethods {
         }
     }
 
-    public String[] initiate (String callback,String user)throws IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
+    public String[] initiate (String callback)throws IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
         String CONS_KEY, CONS_SECRET;
         Properties prop = new Properties();
         try{
@@ -142,7 +138,7 @@ public class OauthMethods {
         //Sign the request
         OAuthConsumer dealabsConsumer = new DefaultOAuthConsumer(CONS_KEY,CONS_SECRET);
         HttpParameters doubleEncodedParams =  new HttpParameters();
-        doubleEncodedParams.put("oauth_callback","http://driven-rider-133516.appspot.com/initiate");
+        doubleEncodedParams.put("oauth_callback",callback);
         dealabsConsumer.setAdditionalParameters(doubleEncodedParams);
         dealabsConsumer.sign(urlConnection);
 
@@ -151,16 +147,62 @@ public class OauthMethods {
         try {
             //System.out.println("Response: " + urlConnection.getResponseCode() + " " + urlConnection.getResponseMessage());
             InputStream in = new BufferedInputStream(urlConnection.getInputStream());
-            String inputStreamString = new Scanner(in,"UTF-8").useDelimiter("\\A").next();
             //System.out.println(inputStreamString);
-            response = inputStreamString;
+            response = new Scanner(in,"UTF-8").useDelimiter("\\A").next();
         }
         finally {
             urlConnection.disconnect();
         }
 
         String[] respArray = response.split("&");
-        String[] tempToken = {respArray[0].split("=")[1],respArray[1].split("=")[1]};
-        return tempToken;
+        return new String[]{respArray[0].split("=")[1],respArray[1].split("=")[1]};
+    }
+
+    public String[] initiate (String endpointUrl, String oauthVerifier, String token, String tokenSecret)throws IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
+        String CONS_KEY, CONS_SECRET;
+        Properties prop = new Properties();
+        try{
+            prop.load(new FileInputStream("resources/dev.properties"));
+        } catch (FileNotFoundException e){
+            System.err.println("[ERROR] Properties file missing!");
+            return null;
+        } catch (IOException e) {
+            System.err.println("[ERROR] Unable to read properties file");
+            return null;
+        }
+        //Google DB not free so using prop file
+        CONS_KEY = prop.getProperty("CONS_KEY");
+        CONS_SECRET = prop.getProperty("CONS_SECRET");
+
+        //Create an HttpURLConnection and add some headers
+        URL url = new URL(endpointUrl);
+        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
+        urlConnection.setRequestProperty("Accept", "application/json");
+        urlConnection.setRequestMethod("POST");
+        urlConnection.setDoOutput(true);
+
+        //Sign the request
+        OAuthConsumer dealabsConsumer = new DefaultOAuthConsumer(CONS_KEY,CONS_SECRET);
+        dealabsConsumer.setTokenWithSecret(token,tokenSecret);
+        HttpParameters doubleEncodedParams =  new HttpParameters();
+        doubleEncodedParams.put("oauth_verifier",oauthVerifier);
+        dealabsConsumer.setAdditionalParameters(doubleEncodedParams);
+        dealabsConsumer.sign(urlConnection);
+
+        String response = null;
+        //Send the request and read the output
+        try {
+            //System.out.println("Response: " + urlConnection.getResponseCode() + " " + urlConnection.getResponseMessage());
+            InputStream in = new BufferedInputStream(urlConnection.getInputStream());
+            //System.out.println(inputStreamString);
+            response = new Scanner(in,"UTF-8").useDelimiter("\\A").next();
+        }
+        finally {
+            urlConnection.disconnect();
+        }
+
+        String[] respArray = response.split("&");
+        return new String[]{respArray[0].split("=")[1],respArray[1].split("=")[1]};
+
     }
 }
