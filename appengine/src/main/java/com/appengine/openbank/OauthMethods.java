@@ -7,49 +7,37 @@ import oauth.signpost.exception.OAuthExpectationFailedException;
 import oauth.signpost.exception.OAuthMessageSignerException;
 import oauth.signpost.http.HttpParameters;
 
-import java.io.BufferedInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStreamWriter;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.Properties;
 import java.util.Scanner;
 
 /**
  * Created by sujai on 19-06-2016.
  */
 public class OauthMethods {
-    private static final String CONS_KEY_SUHAS = "awecf0r5ixzrycpuyqjam4jzk2tslz0ngh0o2hcc";
-    private static final String CONS_SECRET_SUHAS = "32shes2iv3dhdqv1syjq1wp0i5sejs1impqoriqe";
-    private static final String TOKEN_SUHAS = "LO2CE1HLIWSXEQLCEEDRPBVCXPXMGIP0LXE5D1VW";
-    private static final String TOKEN_SECRET_SUHAS = "IUOWKVFEWTSIWRZDGGFCP5I2WCH4G02EG3LAZZGZ";
     public static final String USER_SUHAS = "0";
     public static final String NAME_SUHAS = "Suhas";
-    private static final String CONS_KEY_SUJAI = "dhlk4ijb433mmbegc33q0bmmv2oub2wrzmgs1jvu";
-    private static final String CONS_SECRET_SUJAI = "ikkai5e1z4s0ppv4u3y34tpp1cdb1bmn2cmzssob";
-    private static final String TOKEN_SUJAI = "1DIVMBAGD3QTL5WNYTS4XFZ2PLSCECW1LZDC3I3T";
-    private static final String TOKEN_SECRET_SUJAI = "LJMMR5QOGTS2ZPR33FTZ15YXOBSQ1TNMW5S3TP5Z";
     public static final String USER_SUJAI = "1";
     public static final String NAME_SUJAI = "Sujai";
 
     public String post(String endpointUrl, String JSONPayload, String user)throws IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
 
-        String CONS_KEY = null, CONS_SECRET = null, TOKEN = null, TOKEN_SECRET = null;
-        switch (user){
-            case USER_SUHAS:
-                CONS_KEY = CONS_KEY_SUHAS;
-                CONS_SECRET = CONS_SECRET_SUHAS;
-                TOKEN = TOKEN_SUHAS;
-                TOKEN_SECRET = TOKEN_SECRET_SUHAS;
-                break;
-            case USER_SUJAI:
-                CONS_KEY = CONS_KEY_SUJAI;
-                CONS_SECRET = CONS_SECRET_SUJAI;
-                TOKEN = TOKEN_SUJAI;
-                TOKEN_SECRET = TOKEN_SECRET_SUJAI;
-                break;
+        String CONS_KEY, CONS_SECRET, TOKEN, TOKEN_SECRET;
+        Properties prop = new Properties();
+        try{
+            prop.load(new FileInputStream("resources/dev.properties"));
+        } catch (FileNotFoundException e){
+            System.err.println("[ERROR] Properties file missing!");
+        } catch (IOException e) {
+            System.err.println("[ERROR] Unable to read properties file");
         }
-        //final String JSONPayload = "{\r\n\t\"bank_id\":\"in-bank-x-1\",\r\n\t\"account_id\":\"suhas_IND\",\r\n\t\"amount\":\"100.00\"\r\n}";
+        //Google DB not free so using prop file
+        CONS_KEY = prop.getProperty("CONS_KEY");
+        CONS_SECRET = prop.getProperty("CONS_SECRET");
+        TOKEN = prop.getProperty("TOKEN");
+        TOKEN_SECRET = prop.getProperty("TOKEN_SECRET");
 
         //Create an HttpURLConnection and add some headers
         URL url = new URL(endpointUrl);
@@ -90,21 +78,20 @@ public class OauthMethods {
     }
 
     public String get(String endpointUrl, String user)throws IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
-        String CONS_KEY = null, CONS_SECRET = null, TOKEN = null, TOKEN_SECRET = null;
-        switch (user){
-            case USER_SUHAS:
-                CONS_KEY = CONS_KEY_SUHAS;
-                CONS_SECRET = CONS_SECRET_SUHAS;
-                TOKEN = TOKEN_SUHAS;
-                TOKEN_SECRET = TOKEN_SECRET_SUHAS;
-                break;
-            case USER_SUJAI:
-                CONS_KEY = CONS_KEY_SUJAI;
-                CONS_SECRET = CONS_SECRET_SUJAI;
-                TOKEN = TOKEN_SUJAI;
-                TOKEN_SECRET = TOKEN_SECRET_SUJAI;
-                break;
+        String CONS_KEY, CONS_SECRET, TOKEN, TOKEN_SECRET;
+        Properties prop = new Properties();
+        try{
+            prop.load(new FileInputStream("resources/dev.properties"));
+        } catch (FileNotFoundException e){
+            System.err.println("[ERROR] Properties file missing!");
+        } catch (IOException e) {
+            System.err.println("[ERROR] Unable to read properties file");
         }
+        //Google DB not free so using prop file
+        CONS_KEY = prop.getProperty("CONS_KEY");
+        CONS_SECRET = prop.getProperty("CONS_SECRET");
+        TOKEN = prop.getProperty("TOKEN");
+        TOKEN_SECRET = prop.getProperty("TOKEN_SECRET");
 
         //Create an HttpURLConnection and add some headers
         URL url = new URL(endpointUrl);
@@ -132,17 +119,18 @@ public class OauthMethods {
     }
 
     public String[] initiate (String callback,String user)throws IOException, OAuthMessageSignerException, OAuthExpectationFailedException, OAuthCommunicationException {
-        String CONS_KEY = null, CONS_SECRET = null, TOKEN = null, TOKEN_SECRET = null;
-        switch (user){
-            case USER_SUHAS:
-                CONS_KEY = CONS_KEY_SUHAS;
-                CONS_SECRET = CONS_SECRET_SUHAS;
-                break;
-            case USER_SUJAI:
-                CONS_KEY = CONS_KEY_SUJAI;
-                CONS_SECRET = CONS_SECRET_SUJAI;
-                break;
+        String CONS_KEY, CONS_SECRET;
+        Properties prop = new Properties();
+        try{
+            prop.load(new FileInputStream("resources/dev.properties"));
+        } catch (FileNotFoundException e){
+            System.err.println("[ERROR] Properties file missing!");
+        } catch (IOException e) {
+            System.err.println("[ERROR] Unable to read properties file");
         }
+        //Google DB not free so using prop file
+        CONS_KEY = prop.getProperty("CONS_KEY");
+        CONS_SECRET = prop.getProperty("CONS_SECRET");
 
         //Create an HttpURLConnection and add some headers
         URL url = new URL("https://apisandbox.openbankproject.com/oauth/initiate");
